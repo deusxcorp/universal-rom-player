@@ -143,7 +143,7 @@ export default function RomUploader({ onRomLoad }) {
         {processing ? 'Processing Files...' : (isDragging ? 'Drop ROMs Here' : 'Select or Drop ROM Files')}
       </h2>
       <p className="upload-subtitle">
-        Supports .nes, .sfc, .gb, .gba, .md, .n64, .zip, and multi-file CD games (.cue + .bin)
+        Supports .nes, .sfc, .gb, .gba, .md, .pce, .zip, and multi-file CD games (.cue + .bin)
       </p>
       
       <input 
@@ -151,7 +151,7 @@ export default function RomUploader({ onRomLoad }) {
         className="file-input" 
         ref={fileInputRef} 
         onChange={handleFileChange}
-        accept=".nes,.sfc,.smc,.gb,.gbc,.gba,.md,.smd,.gen,.sms,.gg,.n64,.z64,.iso,.bin,.cue,.chd,.zip"
+        accept=".nes,.sfc,.smc,.gb,.gbc,.gba,.md,.smd,.gen,.sms,.gg,.pce,.iso,.bin,.cue,.chd,.zip"
         multiple
         disabled={processing}
       />
@@ -161,7 +161,7 @@ export default function RomUploader({ onRomLoad }) {
       </button>
 
       <div className="supported-formats">
-        {['NES', 'SNES', 'GBA', 'Genesis', 'N64', 'PS1', 'Saturn', 'Sega CD', 'Arcade'].map(fmt => (
+        {['NES', 'SNES', 'GBA', 'Genesis', 'PS1', 'Sega CD', 'Arcade', 'TurboGrafx-16'].map(fmt => (
           <span key={fmt} className="format-badge">{fmt}</span>
         ))}
       </div>
