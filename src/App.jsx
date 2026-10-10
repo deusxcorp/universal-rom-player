@@ -4,14 +4,14 @@ import EmulatorPlayer from './components/EmulatorPlayer';
 import './index.css';
 
 function App() {
-  const [currentRom, setCurrentRom] = useState(null);
+  const [currentRomState, setCurrentRomState] = useState(null);
 
-  const handleRomLoad = (file) => {
-    setCurrentRom(file);
+  const handleRomLoad = (core, files) => {
+    setCurrentRomState({ core, files });
   };
 
   const handleQuit = () => {
-    setCurrentRom(null);
+    setCurrentRomState(null);
   };
 
   return (
@@ -22,10 +22,10 @@ function App() {
       </header>
 
       <main style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
-        {!currentRom ? (
+        {!currentRomState ? (
           <RomUploader onRomLoad={handleRomLoad} />
         ) : (
-          <EmulatorPlayer romFile={currentRom} onQuit={handleQuit} />
+          <EmulatorPlayer core={currentRomState.core} romFiles={currentRomState.files} onQuit={handleQuit} />
         )}
       </main>
     </div>

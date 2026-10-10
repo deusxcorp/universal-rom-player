@@ -1,9 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Nostalgist } from 'nostalgist';
-import { getCoreForExtension } from '../coreMap';
 import { Play, Pause, Save, Download, XCircle, Maximize, Minimize } from 'lucide-react';
 
-export default function EmulatorPlayer({ romFile, onQuit }) {
+export default function EmulatorPlayer({ core, romFiles, onQuit }) {
   const canvasRef = useRef(null);
   const nostalgistRef = useRef(null);
   const containerRef = useRef(null);
@@ -26,16 +25,13 @@ export default function EmulatorPlayer({ romFile, onQuit }) {
 
     const initEmulator = async () => {
       try {
-        const core = getCoreForExtension(romFile.name);
-        
         if (!core) {
-          throw new Error(`Unsupported ROM format for file: ${romFile.name}`);
+          throw new Error(`Core not provided.`);
         }
 
-        // Configure nostalgist to use our canvas and the right core
         const nostalgist = await Nostalgist.launch({
           core,
-          rom: romFile,
+          rom: romFiles,
           element: canvasRef.current,
           size: { width: 800, height: 600 }
         });
@@ -71,7 +67,7 @@ export default function EmulatorPlayer({ romFile, onQuit }) {
         }
       }
     };
-  }, [romFile]);
+  }, [romFiles, core]);
 
   const handlePauseResume = async () => {
     if (!nostalgistRef.current) return;
