@@ -22,8 +22,12 @@ export default function RomUploader({ onRomLoad }) {
             // Ignore directories
             if (fileData.length === 0 && filename.endsWith('/')) continue;
             
+            // Flatten filename to prevent subdirectory path mismatches
+            const flatFilename = filename.split('/').filter(Boolean).pop();
+            if (!flatFilename) continue;
+
             // Create a File object from the Uint8Array
-            const file = new File([fileData], filename);
+            const file = new File([fileData], flatFilename);
             extractedFiles.push(file);
           }
           resolve(extractedFiles);
@@ -38,21 +42,37 @@ export default function RomUploader({ onRomLoad }) {
     setProcessing(true);
     let files = Array.from(fileList);
     
+    // Check if user dropped a .7z file
+    const has7z = files.some(f => f.name.toLowerCase().endsWith('.7z'));
+    if (has7z) {
+      setProcessing(false);
+      alert('The browser cannot open .7z files directly. Please extract the .7z file on your computer first, then drag in all the extracted files (.cue and .bin).');
+      return;
+    }
+
     // If a single zip file is uploaded, extract it
     if (files.length === 1 && files[0].name.toLowerCase().endsWith('.zip')) {
       try {
         const extracted = await extractZip(files[0]);
-        // Let's see what getCoreOptionsForFiles thinks of the extracted files.
         const res = getCoreOptionsForFiles(extracted);
         if (res && res.options) {
-          // If we found a known core for the extracted files, use them
           files = extracted;
         } else {
-          // Fallback to passing the zip itself (for MAME)
           files = [files[0]];
         }
       } catch (err) {
         console.error("Zip extraction failed:", err);
+      }
+    }
+
+    // Check if a .cue file was uploaded without .bin files
+    const cueFile = files.find(f => f.name.toLowerCase().endsWith('.cue'));
+    if (cueFile) {
+      const binFiles = files.filter(f => f.name.toLowerCase().endsWith('.bin') || f.name.toLowerCase().endsWith('.iso'));
+      if (binFiles.length === 0) {
+        setProcessing(false);
+        alert('A .cue file only contains a track index, not the game data. You must highlight and drag both the .cue file AND the .bin file(s) into the player together.');
+        return;
       }
     }
 
