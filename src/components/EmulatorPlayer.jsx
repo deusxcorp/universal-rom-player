@@ -33,7 +33,23 @@ export default function EmulatorPlayer({ core, romFiles, onQuit }) {
           core,
           rom: romFiles,
           element: canvasRef.current,
-          size: { width: 800, height: 600 }
+          size: { width: 800, height: 600 },
+          retroarchConfig: {
+            input_player1_y: 'z',
+            input_player1_b: 'x',
+            input_player1_a: 'c',
+            input_player1_x: 'v',
+            input_player1_l: 'a',
+            input_player1_r: 's',
+            input_player1_l2: 'q',
+            input_player1_r2: 'w',
+            input_player1_select: 'rshift',
+            input_player1_start: 'enter',
+            input_player1_up: 'up',
+            input_player1_down: 'down',
+            input_player1_left: 'left',
+            input_player1_right: 'right',
+          }
         });
 
         if (active) {
@@ -185,6 +201,35 @@ export default function EmulatorPlayer({ core, romFiles, onQuit }) {
           <button className="control-btn danger" onClick={handleQuit}>
             <XCircle size={18} /> Quit Game
           </button>
+        </div>
+      )}
+
+      {!loading && !isFullscreen && (
+        <div className="controls-guide glass-panel">
+          <div className="guide-item">
+            <span className="guide-label">D-Pad:</span>
+            <span className="key-badge">↑</span>
+            <span className="key-badge">↓</span>
+            <span className="key-badge">←</span>
+            <span className="key-badge">→</span>
+          </div>
+          <div className="guide-item">
+            <span className="guide-label">Action Buttons:</span>
+            <span className="key-badge highlight">Z</span>
+            <span className="key-badge highlight">X</span>
+            <span className="key-badge highlight">C</span>
+            <span className="key-badge highlight">V</span>
+          </div>
+          <div className="guide-item">
+            <span className="guide-label">Shoulders:</span>
+            <span className="key-badge">A</span>
+            <span className="key-badge">S</span>
+          </div>
+          <div className="guide-item">
+            <span className="guide-label">System:</span>
+            <span className="key-badge">Shift</span>
+            <span className="key-badge">Enter</span>
+          </div>
         </div>
       )}
     </div>

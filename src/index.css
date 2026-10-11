@@ -319,3 +319,46 @@ button {
 .player-container:fullscreen .player-controls:hover {
   opacity: 1;
 }
+
+/* Controls Guide */
+.controls-guide {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 0.8rem 1.5rem;
+  font-size: 0.85rem;
+  border-radius: var(--border-radius-md);
+  color: var(--secondary-color);
+}
+
+.guide-item {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.guide-label {
+  font-weight: 600;
+  margin-right: 0.25rem;
+  color: var(--text-light);
+}
+
+.key-badge {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+  font-family: monospace;
+  font-weight: 700;
+  color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.key-badge.highlight {
+  background: rgba(102, 252, 241, 0.15);
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
