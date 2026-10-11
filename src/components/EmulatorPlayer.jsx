@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Nostalgist } from 'nostalgist';
-import { Play, Pause, Save, Download, XCircle, Maximize, Minimize } from 'lucide-react';
+import { Play, Pause, Save, Download, XCircle, Maximize, Minimize, Gamepad2 } from 'lucide-react';
+import { getSavedInputConfig, formatKeyDisplay } from '../utils/inputMap';
+import ControlsModal from './ControlsModal';
 
 export default function EmulatorPlayer({ core, romFiles, onQuit }) {
   const canvasRef = useRef(null);
@@ -11,6 +13,8 @@ export default function EmulatorPlayer({ core, romFiles, onQuit }) {
   const [isPaused, setIsPaused] = useState(false);
   const [saveState, setSaveState] = useState(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [controlsConfig, setControlsConfig] = useState(getSavedInputConfig());
+  const [showControlsModal, setShowControlsModal] = useState(false);
 
   useEffect(() => {
     const handleFullscreenChange = () => {
@@ -29,26 +33,15 @@ export default function EmulatorPlayer({ core, romFiles, onQuit }) {
           throw new Error(`Core not provided.`);
         }
 
+        const inputConfig = getSavedInputConfig();
+
         const nostalgist = await Nostalgist.launch({
           core,
           rom: romFiles,
           element: canvasRef.current,
           size: { width: 800, height: 600 },
           retroarchConfig: {
-            input_player1_y: 'z',
-            input_player1_b: 'x',
-            input_player1_a: 'c',
-            input_player1_x: 'v',
-            input_player1_l: 'a',
-            input_player1_r: 's',
-            input_player1_l2: 'q',
-            input_player1_r2: 'w',
-            input_player1_select: 'rshift',
-            input_player1_start: 'enter',
-            input_player1_up: 'up',
-            input_player1_down: 'down',
-            input_player1_left: 'left',
-            input_player1_right: 'right',
+            ...inputConfig
           }
         });
 
@@ -197,6 +190,10 @@ export default function EmulatorPlayer({ core, romFiles, onQuit }) {
             {isFullscreen ? <Minimize size={18} /> : <Maximize size={18} />}
             {isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}
           </button>
+
+          <button className="control-btn" onClick={() => setShowControlsModal(true)}>
+            <Gamepad2 size={18} /> Controls
+          </button>
           
           <button className="control-btn danger" onClick={handleQuit}>
             <XCircle size={18} /> Quit Game
@@ -208,30 +205,36 @@ export default function EmulatorPlayer({ core, romFiles, onQuit }) {
         <div className="controls-guide glass-panel">
           <div className="guide-item">
             <span className="guide-label">D-Pad:</span>
-            <span className="key-badge">↑</span>
-            <span className="key-badge">↓</span>
-            <span className="key-badge">←</span>
-            <span className="key-badge">→</span>
+            <span className="key-badge">{formatKeyDisplay(controlsConfig.input_player1_up)}</span>
+            <span className="key-badge">{formatKeyDisplay(controlsConfig.input_player1_down)}</span>
+            <span className="key-badge">{formatKeyDisplay(controlsConfig.input_player1_left)}</span>
+            <span className="key-badge">{formatKeyDisplay(controlsConfig.input_player1_right)}</span>
           </div>
           <div className="guide-item">
-            <span className="guide-label">Action Buttons:</span>
-            <span className="key-badge highlight">Z</span>
-            <span className="key-badge highlight">X</span>
-            <span className="key-badge highlight">C</span>
-            <span className="key-badge highlight">V</span>
+            <span className="guide-label">Action:</span>
+            <span className="key-badge highlight">{formatKeyDisplay(controlsConfig.input_player1_y)}</span>
+            <span className="key-badge highlight">{formatKeyDisplay(controlsConfig.input_player1_b)}</span>
+            <span className="key-badge highlight">{formatKeyDisplay(controlsConfig.input_player1_a)}</span>
+            <span className="key-badge highlight">{formatKeyDisplay(controlsConfig.input_player1_x)}</span>
           </div>
           <div className="guide-item">
             <span className="guide-label">Shoulders:</span>
-            <span className="key-badge">A</span>
-            <span className="key-badge">S</span>
+            <span className="key-badge">{formatKeyDisplay(controlsConfig.input_player1_l)}</span>
+            <span className="key-badge">{formatKeyDisplay(controlsConfig.input_player1_r)}</span>
           </div>
           <div className="guide-item">
             <span className="guide-label">System:</span>
-            <span className="key-badge">Shift</span>
-            <span className="key-badge">Enter</span>
+            <span className="key-badge">{formatKeyDisplay(controlsConfig.input_player1_select)}</span>
+            <span className="key-badge">{formatKeyDisplay(controlsConfig.input_player1_start)}</span>
           </div>
         </div>
       )}
+
+      <ControlsModal 
+        isOpen={showControlsModal} 
+        onClose={() => setShowControlsModal(false)}
+        onConfigSaved={(newCfg) => setControlsConfig(newCfg)}
+      />
     </div>
   );
 }
