@@ -100,10 +100,10 @@ const CODE_TO_RETROARCH = {
 
 // Friendly display names for badges
 const RETROARCH_TO_DISPLAY = {
-  up: '↑ Up',
-  down: '↓ Down',
-  left: '← Left',
-  right: '→ Right',
+  up: 'Up',
+  down: 'Down',
+  left: 'Left',
+  right: 'Right',
   enter: 'Enter',
   space: 'Space',
   shift: 'L-Shift',

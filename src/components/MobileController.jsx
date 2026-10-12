@@ -1,6 +1,17 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { createClientSession } from '../utils/inputRemote';
-import { Wifi, WifiOff, Maximize, Minimize, Vibrate, Sparkles, RefreshCw, Users } from 'lucide-react';
+import { 
+  WifiOff, 
+  Maximize, 
+  Minimize, 
+  Vibrate, 
+  VibrateOff, 
+  RefreshCw, 
+  ChevronUp, 
+  ChevronDown, 
+  ChevronLeft, 
+  ChevronRight 
+} from 'lucide-react';
 
 export default function MobileController({ roomId: propRoomId }) {
   const [roomId, setRoomId] = useState(propRoomId || '');
@@ -150,7 +161,7 @@ export default function MobileController({ roomId: propRoomId }) {
             onClick={() => setHapticsEnabled(!hapticsEnabled)}
             title="Toggle Vibration"
           >
-            <Vibrate size={15} style={{ opacity: hapticsEnabled ? 1 : 0.4 }} />
+            {hapticsEnabled ? <Vibrate size={15} /> : <VibrateOff size={15} style={{ opacity: 0.5 }} />}
             <span>{hapticsEnabled ? 'Haptics' : 'Off'}</span>
           </button>
           <button 
@@ -190,29 +201,33 @@ export default function MobileController({ roomId: propRoomId }) {
             <button 
               className={`dpad-btn up ${activeButtons.has('up') ? 'active' : ''}`}
               {...getButtonHandlers('up')}
+              aria-label="Up"
             >
-              ▲
+              <ChevronUp size={24} />
             </button>
             <div className="dpad-middle-row">
               <button 
                 className={`dpad-btn left ${activeButtons.has('left') ? 'active' : ''}`}
                 {...getButtonHandlers('left')}
+                aria-label="Left"
               >
-                ◀
+                <ChevronLeft size={24} />
               </button>
               <div className="dpad-center" />
               <button 
                 className={`dpad-btn right ${activeButtons.has('right') ? 'active' : ''}`}
                 {...getButtonHandlers('right')}
+                aria-label="Right"
               >
-                ▶
+                <ChevronRight size={24} />
               </button>
             </div>
             <button 
               className={`dpad-btn down ${activeButtons.has('down') ? 'active' : ''}`}
               {...getButtonHandlers('down')}
+              aria-label="Down"
             >
-              ▼
+              <ChevronDown size={24} />
             </button>
           </div>
         </div>
