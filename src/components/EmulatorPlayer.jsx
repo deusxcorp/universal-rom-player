@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Nostalgist } from 'nostalgist';
-import { Play, Pause, Save, Download, XCircle, Maximize, Minimize, Gamepad2, Smartphone } from 'lucide-react';
+import { Play, Pause, Save, Download, XCircle, Maximize, Minimize, Gamepad2, Smartphone, Users } from 'lucide-react';
 import { getSavedInputConfig, formatKeyDisplay } from '../utils/inputMap';
 import { generateRoomId, createHostSession } from '../utils/inputRemote';
 import ControlsModal from './ControlsModal';
@@ -18,9 +18,9 @@ export default function EmulatorPlayer({ core, romFiles, onQuit }) {
   const [controlsConfig, setControlsConfig] = useState(getSavedInputConfig());
   const [showControlsModal, setShowControlsModal] = useState(false);
 
-  // Mobile Remote Controller State
+  // Mobile Remote Controller State (Multi-Player P1 & P2)
   const [roomId] = useState(() => generateRoomId());
-  const [isRemoteConnected, setIsRemoteConnected] = useState(false);
+  const [connectedPlayers, setConnectedPlayers] = useState({ player1: false, player2: false, count: 0 });
   const [showPairingModal, setShowPairingModal] = useState(false);
   const hostSessionRef = useRef(null);
 
@@ -32,22 +32,20 @@ export default function EmulatorPlayer({ core, romFiles, onQuit }) {
     return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
   }, []);
 
-  // WebRTC Host Session for Remote Phone Controller
+  // WebRTC Host Session for Remote Phone Controllers (Up to 2 players)
   useEffect(() => {
     const session = createHostSession(roomId, {
-      onConnected: () => {
-        setIsRemoteConnected(true);
-      },
-      onDisconnected: () => {
-        setIsRemoteConnected(false);
+      onPlayersChange: (status) => {
+        setConnectedPlayers(status);
       },
       onInput: (data) => {
         if (!nostalgistRef.current) return;
         try {
+          const player = data.player || 1;
           if (data.type === 'down') {
-            nostalgistRef.current.pressDown(data.button);
+            nostalgistRef.current.pressDown({ button: data.button, player });
           } else if (data.type === 'up') {
-            nostalgistRef.current.pressUp(data.button);
+            nostalgistRef.current.pressUp({ button: data.button, player });
           }
         } catch (err) {
           console.warn('Error applying remote input:', err);
@@ -234,12 +232,26 @@ export default function EmulatorPlayer({ core, romFiles, onQuit }) {
           </button>
 
           <button 
-            className={`control-btn ${isRemoteConnected ? 'remote-active' : ''}`}
+            className={`control-btn ${connectedPlayers.count > 0 ? 'remote-active' : ''}`}
             onClick={() => setShowPairingModal(true)}
             title="Use phone as game controller"
           >
-            <Smartphone size={18} />
-            {isRemoteConnected ? 'Phone Active' : 'Phone'}
+            {connectedPlayers.count >= 2 ? (
+              <>
+                <Users size={18} />
+                2 Phones (P1+P2)
+              </>
+            ) : connectedPlayers.count === 1 ? (
+              <>
+                <Smartphone size={18} />
+                1 Phone (P1)
+              </>
+            ) : (
+              <>
+                <Smartphone size={18} />
+                Phone
+              </>
+            )}
           </button>
           
           <button className="control-btn danger" onClick={handleQuit}>
@@ -287,7 +299,7 @@ export default function EmulatorPlayer({ core, romFiles, onQuit }) {
         isOpen={showPairingModal} 
         onClose={() => setShowPairingModal(false)}
         roomId={roomId}
-        isConnected={isRemoteConnected}
+        connectedPlayers={connectedPlayers}
       />
     </div>
   );

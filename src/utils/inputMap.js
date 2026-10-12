@@ -24,6 +24,30 @@ export const DEFAULT_INPUT_CONFIG = {
   input_player1_start: 'enter',
 };
 
+export const DEFAULT_PLAYER2_CONFIG = {
+  // D-Pad
+  input_player2_up: 'num8',
+  input_player2_down: 'num2',
+  input_player2_left: 'num4',
+  input_player2_right: 'num6',
+
+  // Action buttons
+  input_player2_y: 'i',
+  input_player2_b: 'k',
+  input_player2_a: 'l',
+  input_player2_x: 'o',
+
+  // Shoulders & Triggers
+  input_player2_l: 'u',
+  input_player2_r: 'p',
+  input_player2_l2: '7',
+  input_player2_r2: '9',
+
+  // System
+  input_player2_select: 'num0',
+  input_player2_start: 'numenter',
+};
+
 export const BUTTON_METADATA = [
   { id: 'input_player1_up', label: 'Up', consoleHint: 'D-Pad Up', group: 'D-Pad' },
   { id: 'input_player1_down', label: 'Down', consoleHint: 'D-Pad Down', group: 'D-Pad' },
@@ -147,12 +171,12 @@ export function formatKeyDisplay(retroarchKey) {
 export function getSavedInputConfig() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return { ...DEFAULT_INPUT_CONFIG };
+    if (!raw) return { ...DEFAULT_PLAYER2_CONFIG, ...DEFAULT_INPUT_CONFIG };
     const parsed = JSON.parse(raw);
-    return { ...DEFAULT_INPUT_CONFIG, ...parsed };
+    return { ...DEFAULT_PLAYER2_CONFIG, ...DEFAULT_INPUT_CONFIG, ...parsed };
   } catch (err) {
     console.error('Failed to load saved controls:', err);
-    return { ...DEFAULT_INPUT_CONFIG };
+    return { ...DEFAULT_PLAYER2_CONFIG, ...DEFAULT_INPUT_CONFIG };
   }
 }
 

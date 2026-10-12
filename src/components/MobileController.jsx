@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { createClientSession } from '../utils/inputRemote';
-import { Wifi, WifiOff, Maximize, Minimize, Volume2, Sparkles, RefreshCw } from 'lucide-react';
+import { Wifi, WifiOff, Maximize, Minimize, Vibrate, Sparkles, RefreshCw, Users } from 'lucide-react';
 
 export default function MobileController({ roomId: propRoomId }) {
   const [roomId, setRoomId] = useState(propRoomId || '');
   const [status, setStatus] = useState('connecting'); // 'connecting' | 'connected' | 'disconnected' | 'error'
+  const [playerNumber, setPlayerNumber] = useState(1); // 1 or 2
   const [hapticsEnabled, setHapticsEnabled] = useState(true);
   const [activeButtons, setActiveButtons] = useState(new Set());
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -31,6 +32,9 @@ export default function MobileController({ roomId: propRoomId }) {
       onConnected: () => {
         setStatus('connected');
         if (navigator.vibrate) navigator.vibrate([30, 50, 30]);
+      },
+      onPlayerAssigned: (assignedSlot) => {
+        setPlayerNumber(assignedSlot);
       },
       onDisconnected: () => {
         setStatus('disconnected');
@@ -116,7 +120,7 @@ export default function MobileController({ roomId: propRoomId }) {
         <WifiOff size={48} style={{ color: 'var(--danger-color)', marginBottom: '1rem' }} />
         <h2>Connection Failed</h2>
         <p>Could not connect to laptop room <strong>{roomId || 'Unknown'}</strong>.</p>
-        <p className="error-hint">Make sure the laptop has the game running and you are connected to the internet or local network.</p>
+        <p className="error-hint">Make sure the laptop has the game running and the room is not already full (max 2 players).</p>
         <button 
           className="btn-primary" 
           style={{ marginTop: '1.5rem' }}
@@ -129,13 +133,14 @@ export default function MobileController({ roomId: propRoomId }) {
   }
 
   return (
-    <div className="mobile-gamepad-container">
+    <div className={`mobile-gamepad-container player-${playerNumber}`}>
       {/* Top Status & Controls Bar */}
       <div className="gamepad-topbar">
         <div className="connection-pill">
           <span className={`status-dot ${status === 'connected' ? 'connected' : 'waiting'}`} />
+          <span className={`player-badge-tag p${playerNumber}`}>P{playerNumber}</span>
           <span className="status-label">
-            {status === 'connected' ? `Connected: ${roomId}` : 'Connecting to laptop...'}
+            {status === 'connected' ? `Player ${playerNumber}` : 'Connecting...'}
           </span>
         </div>
 
@@ -145,14 +150,15 @@ export default function MobileController({ roomId: propRoomId }) {
             onClick={() => setHapticsEnabled(!hapticsEnabled)}
             title="Toggle Vibration"
           >
-            {hapticsEnabled ? '📳 Haptics On' : '📴 Haptics Off'}
+            <Vibrate size={15} style={{ opacity: hapticsEnabled ? 1 : 0.4 }} />
+            <span>{hapticsEnabled ? 'Haptics' : 'Off'}</span>
           </button>
           <button 
             className="topbar-btn" 
             onClick={toggleFullscreen}
             title="Toggle Fullscreen"
           >
-            {isFullscreen ? <Minimize size={16} /> : <Maximize size={16} />}
+            {isFullscreen ? <Minimize size={15} /> : <Maximize size={15} />}
           </button>
         </div>
       </div>
@@ -165,7 +171,9 @@ export default function MobileController({ roomId: propRoomId }) {
         >
           L1
         </button>
-        <div className="shoulder-spacer" />
+        <div className="shoulder-spacer">
+          <span className="room-indicator-mini">{roomId}</span>
+        </div>
         <button 
           className={`shoulder-btn ${activeButtons.has('r') ? 'active' : ''}`}
           {...getButtonHandlers('r')}

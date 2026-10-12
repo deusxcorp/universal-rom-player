@@ -11,43 +11,87 @@ export function generateRoomId() {
 
 /**
  * Initializes the Host session on the laptop emulator.
+ * Supports up to 2 simultaneous phone controllers (Player 1 and Player 2).
  */
 export function createHostSession(roomId, callbacks = {}) {
-  const { onReady, onConnected, onDisconnected, onInput, onError } = callbacks;
+  const { onReady, onPlayersChange, onInput, onError } = callbacks;
 
-  let activeConn = null;
+  const playerConnections = {
+    1: null,
+    2: null,
+  };
+
   const peer = new Peer(roomId, {
     debug: 1,
   });
+
+  const notifyPlayersChange = () => {
+    if (onPlayersChange) {
+      onPlayersChange({
+        player1: !!playerConnections[1] && playerConnections[1].open,
+        player2: !!playerConnections[2] && playerConnections[2].open,
+        count: (playerConnections[1]?.open ? 1 : 0) + (playerConnections[2]?.open ? 1 : 0),
+      });
+    }
+  };
 
   peer.on('open', (id) => {
     if (onReady) onReady(id);
   });
 
   peer.on('connection', (conn) => {
-    // If another phone connects, replace or accept connection
-    if (activeConn) {
-      try { activeConn.close(); } catch (e) {}
+    // Find first available slot (1 then 2)
+    let assignedSlot = null;
+    if (!playerConnections[1] || !playerConnections[1].open) {
+      assignedSlot = 1;
+    } else if (!playerConnections[2] || !playerConnections[2].open) {
+      assignedSlot = 2;
     }
-    activeConn = conn;
+
+    if (!assignedSlot) {
+      // Both slots occupied
+      console.warn('Room full: Maximum 2 phone controllers allowed');
+      conn.on('open', () => {
+        conn.send({ type: 'room_full', message: 'Room is full (2 players connected)' });
+        setTimeout(() => {
+          try { conn.close(); } catch (e) {}
+        }, 500);
+      });
+      return;
+    }
+
+    conn.playerNumber = assignedSlot;
+    playerConnections[assignedSlot] = conn;
 
     conn.on('open', () => {
-      if (onConnected) onConnected(conn);
+      // Send handshake identifying assigned player slot
+      conn.send({
+        type: 'handshake',
+        player: assignedSlot,
+        roomId,
+      });
+      notifyPlayersChange();
     });
 
     conn.on('data', (data) => {
       if (onInput && data && data.button) {
-        onInput(data);
+        onInput({
+          button: data.button,
+          type: data.type,
+          player: conn.playerNumber || 1,
+        });
       }
     });
 
     conn.on('close', () => {
-      activeConn = null;
-      if (onDisconnected) onDisconnected();
+      if (playerConnections[assignedSlot] === conn) {
+        playerConnections[assignedSlot] = null;
+      }
+      notifyPlayersChange();
     });
 
     conn.on('error', (err) => {
-      console.warn('Peer connection error:', err);
+      console.warn(`Peer connection error for Player ${assignedSlot}:`, err);
     });
   });
 
@@ -58,12 +102,19 @@ export function createHostSession(roomId, callbacks = {}) {
 
   return {
     destroy: () => {
-      if (activeConn) {
-        try { activeConn.close(); } catch (e) {}
-      }
+      [1, 2].forEach((slot) => {
+        if (playerConnections[slot]) {
+          try { playerConnections[slot].close(); } catch (e) {}
+          playerConnections[slot] = null;
+        }
+      });
       try { peer.destroy(); } catch (e) {}
     },
-    isConnected: () => !!activeConn && activeConn.open,
+    getConnectedPlayers: () => ({
+      player1: !!playerConnections[1]?.open,
+      player2: !!playerConnections[2]?.open,
+      count: (playerConnections[1]?.open ? 1 : 0) + (playerConnections[2]?.open ? 1 : 0),
+    }),
   };
 }
 
@@ -71,7 +122,7 @@ export function createHostSession(roomId, callbacks = {}) {
  * Initializes the Client controller session on the mobile device.
  */
 export function createClientSession(roomId, callbacks = {}) {
-  const { onConnected, onDisconnected, onError } = callbacks;
+  const { onConnected, onDisconnected, onPlayerAssigned, onError } = callbacks;
 
   let conn = null;
   const peer = new Peer({
@@ -85,6 +136,14 @@ export function createClientSession(roomId, callbacks = {}) {
 
     conn.on('open', () => {
       if (onConnected) onConnected();
+    });
+
+    conn.on('data', (data) => {
+      if (data && data.type === 'handshake' && data.player) {
+        if (onPlayerAssigned) onPlayerAssigned(data.player);
+      } else if (data && data.type === 'room_full') {
+        if (onError) onError(new Error(data.message || 'Room is full'));
+      }
     });
 
     conn.on('close', () => {

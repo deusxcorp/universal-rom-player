@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import QRCode from 'qrcode';
-import { X, Smartphone, Copy, Check, Wifi, Sparkles } from 'lucide-react';
+import { X, Smartphone, Copy, Check, Users, Sparkles, Zap, Vibrate, CheckCircle2 } from 'lucide-react';
 
-export default function PhonePairingModal({ isOpen, onClose, roomId, isConnected }) {
+export default function PhonePairingModal({ isOpen, onClose, roomId, connectedPlayers = { player1: false, player2: false, count: 0 } }) {
   const [qrCodeUrl, setQrCodeUrl] = useState('');
   const [copied, setCopied] = useState(false);
 
@@ -35,6 +35,8 @@ export default function PhonePairingModal({ isOpen, onClose, roomId, isConnected
     }
   };
 
+  const { player1 = false, player2 = false, count = 0 } = connectedPlayers;
+
   return (
     <div className="modal-backdrop" onClick={onClose}>
       <div className="pairing-modal glass-panel" onClick={(e) => e.stopPropagation()}>
@@ -43,7 +45,7 @@ export default function PhonePairingModal({ isOpen, onClose, roomId, isConnected
             <Smartphone size={28} style={{ color: 'var(--primary-color)' }} />
             <div>
               <h2>Use Phone as Controller</h2>
-              <p className="modal-subtitle">Scan with your phone's camera to play wirelessly</p>
+              <p className="modal-subtitle">Scan with phone camera to connect up to 2 players</p>
             </div>
           </div>
           <button className="icon-close-btn" onClick={onClose} aria-label="Close">
@@ -52,13 +54,33 @@ export default function PhonePairingModal({ isOpen, onClose, roomId, isConnected
         </div>
 
         <div className="pairing-content">
-          <div className="pairing-status-badge">
-            <span className={`status-dot ${isConnected ? 'connected' : 'waiting'}`} />
-            {isConnected ? (
-              <span className="status-text connected">Phone Controller Connected! 🎮</span>
-            ) : (
-              <span className="status-text waiting">Waiting for phone to scan...</span>
-            )}
+          {/* Dual Player Slots Status Grid */}
+          <div className="players-status-grid">
+            <div className={`player-slot-card p1 ${player1 ? 'active' : ''}`}>
+              <div className="slot-header">
+                <span className="player-tag p1">P1</span>
+                <span className="slot-title">Player 1</span>
+              </div>
+              <div className="slot-status">
+                <span className={`status-dot ${player1 ? 'connected' : 'waiting'}`} />
+                <span className={`status-text ${player1 ? 'connected' : 'waiting'}`}>
+                  {player1 ? 'Connected' : 'Waiting for scan...'}
+                </span>
+              </div>
+            </div>
+
+            <div className={`player-slot-card p2 ${player2 ? 'active' : ''}`}>
+              <div className="slot-header">
+                <span className="player-tag p2">P2</span>
+                <span className="slot-title">Player 2</span>
+              </div>
+              <div className="slot-status">
+                <span className={`status-dot ${player2 ? 'connected' : 'waiting'}`} />
+                <span className={`status-text ${player2 ? 'connected' : 'waiting'}`}>
+                  {player2 ? 'Connected' : 'Waiting for scan...'}
+                </span>
+              </div>
+            </div>
           </div>
 
           <div className="qr-container">
@@ -88,15 +110,28 @@ export default function PhonePairingModal({ isOpen, onClose, roomId, isConnected
           </div>
 
           <div className="pairing-features-hint">
-            <span>✨ No app download needed</span>
-            <span>⚡ Ultra-low latency P2P</span>
-            <span>📳 Haptic touch feedback</span>
+            <div className="hint-item">
+              <Sparkles size={14} />
+              <span>No app download needed</span>
+            </div>
+            <div className="hint-item">
+              <Zap size={14} />
+              <span>Ultra-low latency P2P</span>
+            </div>
+            <div className="hint-item">
+              <Vibrate size={14} />
+              <span>Haptic touch feedback</span>
+            </div>
+            <div className="hint-item">
+              <Users size={14} />
+              <span>2-Player simultaneous</span>
+            </div>
           </div>
         </div>
 
         <div className="modal-footer" style={{ justifyContent: 'flex-end' }}>
           <button className="btn-primary" onClick={onClose}>
-            {isConnected ? 'Start Playing' : 'Close'}
+            {count > 0 ? 'Start Playing' : 'Close'}
           </button>
         </div>
       </div>

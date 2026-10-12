@@ -621,14 +621,72 @@ button {
   gap: 1.25rem;
 }
 
-.pairing-status-badge {
-  display: inline-flex;
+.players-status-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.player-slot-card {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  padding: 0.65rem 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  transition: all 0.25s ease;
+}
+
+.player-slot-card.p1.active {
+  border-color: #66fcf1;
+  background: rgba(102, 252, 241, 0.08);
+  box-shadow: 0 0 16px rgba(102, 252, 241, 0.2);
+}
+
+.player-slot-card.p2.active {
+  border-color: #f59e0b;
+  background: rgba(245, 158, 11, 0.08);
+  box-shadow: 0 0 16px rgba(245, 158, 11, 0.2);
+}
+
+.slot-header {
+  display: flex;
   align-items: center;
-  gap: 0.6rem;
-  padding: 0.45rem 1.1rem;
-  border-radius: 20px;
-  background: rgba(0, 0, 0, 0.45);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  gap: 0.45rem;
+}
+
+.player-tag {
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 0.15rem 0.45rem;
+  border-radius: 6px;
+  letter-spacing: 0.05em;
+}
+
+.player-tag.p1 {
+  background: rgba(102, 252, 241, 0.2);
+  color: #66fcf1;
+  border: 1px solid rgba(102, 252, 241, 0.4);
+}
+
+.player-tag.p2 {
+  background: rgba(245, 158, 11, 0.2);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.4);
+}
+
+.slot-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-light);
+}
+
+.slot-status {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
 }
 
 .status-dot {
@@ -750,12 +808,27 @@ button {
 
 .pairing-features-hint {
   display: flex;
-  gap: 0.75rem;
+  gap: 0.5rem;
   flex-wrap: wrap;
   justify-content: center;
-  font-size: 0.75rem;
-  color: var(--secondary-color);
   margin-top: 0.2rem;
+}
+
+.hint-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--secondary-color);
+  font-size: 0.75rem;
+  background: rgba(255, 255, 255, 0.04);
+  padding: 0.35rem 0.7rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.hint-item svg {
+  color: var(--primary-color);
+  flex-shrink: 0;
 }
 
 /* Active glowing state for Toolbar Remote Button */
@@ -833,6 +906,26 @@ button {
   color: var(--text-light);
 }
 
+.player-badge-tag {
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 0.15rem 0.45rem;
+  border-radius: 6px;
+  letter-spacing: 0.05em;
+}
+
+.player-badge-tag.p1 {
+  background: rgba(102, 252, 241, 0.25);
+  color: #66fcf1;
+  border: 1px solid rgba(102, 252, 241, 0.4);
+}
+
+.player-badge-tag.p2 {
+  background: rgba(245, 158, 11, 0.25);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.4);
+}
+
 .topbar-actions {
   display: flex;
   gap: 0.5rem;
@@ -894,6 +987,17 @@ button {
 
 .shoulder-spacer {
   flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.room-indicator-mini {
+  font-family: monospace;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.35);
+  font-weight: 700;
+  letter-spacing: 0.05em;
 }
 
 /* Main Body with D-Pad, Center, and Actions */
@@ -1072,6 +1176,34 @@ button {
   filter: brightness(1.3);
   box-shadow: 0 0 24px currentColor;
 }
+
+/* ==========================================================================
+   Player 2 Theme Overrides
+   ========================================================================== */
+
+.mobile-gamepad-container.player-2 {
+  background-image: 
+    radial-gradient(circle at 50% 50%, rgba(55, 38, 20, 0.85), #07080a 90%);
+}
+
+.mobile-gamepad-container.player-2 .shoulder-btn.active {
+  background: #f59e0b;
+  color: #0b0c10;
+  box-shadow: 0 0 20px #f59e0b;
+}
+
+.mobile-gamepad-container.player-2 .dpad-btn.active {
+  background: #f59e0b;
+  color: #0b0c10;
+  box-shadow: 0 0 18px #f59e0b;
+}
+
+.mobile-gamepad-container.player-2 .pill-btn.active {
+  background: #f59e0b;
+  color: #0b0c10;
+  box-shadow: 0 0 16px #f59e0b;
+}
+
 
 
 
