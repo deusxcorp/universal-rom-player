@@ -1313,28 +1313,38 @@ button {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.65rem 1.25rem;
-  background: rgba(0, 0, 0, 0.5);
+  padding: 0.65rem 1rem;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(12px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   flex-shrink: 0;
+  gap: 0.5rem;
+}
+
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
 }
 
 .connection-pill {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.4rem;
   background: rgba(255, 255, 255, 0.05);
-  padding: 0.35rem 0.8rem;
-  border-radius: 16px;
-  font-size: 0.8rem;
-  font-weight: 600;
+  padding: 0.35rem 0.6rem;
+  border-radius: 14px;
+  font-size: 0.75rem;
+  font-weight: 700;
   color: var(--text-light);
+  flex-shrink: 0;
 }
 
 .player-badge-tag {
   font-size: 0.7rem;
   font-weight: 800;
-  padding: 0.15rem 0.45rem;
+  padding: 0.1rem 0.4rem;
   border-radius: 6px;
   letter-spacing: 0.05em;
 }
@@ -1351,10 +1361,45 @@ button {
   border: 1px solid rgba(245, 158, 11, 0.4);
 }
 
+.skin-indicator-btn {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  color: var(--text-light);
+  font-size: 0.72rem;
+  padding: 0.35rem 0.65rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  max-width: 130px;
+}
+
+.skin-label-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.variant-toggle-btn {
+  background: rgba(102, 252, 241, 0.1);
+  border: 1px solid rgba(102, 252, 241, 0.3);
+  color: var(--primary-color);
+  border-radius: 12px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.35rem 0.65rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
 .topbar-actions {
   display: flex;
-  gap: 0.5rem;
+  gap: 0.4rem;
   align-items: center;
+  flex-shrink: 0;
 }
 
 .topbar-btn {
@@ -1369,11 +1414,12 @@ button {
   align-items: center;
   gap: 0.3rem;
   touch-action: manipulation;
-  transition: background 0.15s ease;
+  transition: all 0.15s ease;
 }
 
 .topbar-btn:active {
   background: rgba(255, 255, 255, 0.2);
+  transform: scale(0.95);
 }
 
 /* Shoulder Buttons */
@@ -1420,7 +1466,7 @@ button {
 .room-indicator-mini {
   font-family: monospace;
   font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.35);
+  color: rgba(255, 255, 255, 0.45);
   font-weight: 700;
   letter-spacing: 0.05em;
 }
@@ -1443,7 +1489,27 @@ button {
   align-items: center;
 }
 
+.dpad-cross-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.genesis-dpad-ring {
+  position: absolute;
+  width: 144px;
+  height: 144px;
+  border-radius: 50%;
+  border: 3px solid rgba(220, 38, 38, 0.6);
+  background: radial-gradient(circle, rgba(0, 0, 0, 0.8) 0%, rgba(20, 20, 25, 0.95) 100%);
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.8), 0 4px 16px rgba(0, 0, 0, 0.6);
+  z-index: 0;
+}
+
 .dpad-cross {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1511,6 +1577,11 @@ button {
   padding: 0 0.5rem;
 }
 
+.center-zone.layout-nes {
+  flex-direction: row;
+  gap: 1.5rem;
+}
+
 .pill-btn {
   width: 68px;
   height: 28px;
@@ -1531,6 +1602,21 @@ button {
   transition: transform 0.08s ease, background 0.08s ease;
 }
 
+.center-zone.layout-nes .pill-btn {
+  transform: none;
+  border-radius: 6px;
+  height: 22px;
+  width: 62px;
+}
+
+.genesis-start-btn {
+  transform: none;
+  width: 76px;
+  height: 32px;
+  border-radius: 16px;
+  font-size: 0.72rem;
+}
+
 .pill-btn.active {
   background: var(--primary-color);
   color: #0b0c10;
@@ -1538,7 +1624,15 @@ button {
   box-shadow: 0 0 16px var(--primary-color);
 }
 
-/* Action Diamond Buttons */
+.center-zone.layout-nes .pill-btn.active {
+  transform: scale(0.92);
+}
+
+.genesis-start-btn.active {
+  transform: scale(0.92);
+}
+
+/* Action Zone */
 .action-zone {
   flex: 1;
   display: flex;
@@ -1546,6 +1640,7 @@ button {
   align-items: center;
 }
 
+/* 4-Button Diamond Layout */
 .action-diamond {
   display: flex;
   flex-direction: column;
@@ -1576,58 +1671,351 @@ button {
   transition: transform 0.08s ease, box-shadow 0.08s ease, filter 0.08s ease;
 }
 
-.action-btn.btn-x {
-  background: #0284c7;
-  color: #ffffff;
-}
-
-.action-btn.btn-y {
-  background: #16a34a;
-  color: #ffffff;
-}
-
-.action-btn.btn-b {
-  background: #eab308;
-  color: #111827;
-}
-
-.action-btn.btn-a {
-  background: #dc2626;
-  color: #ffffff;
-}
-
 .action-btn.active {
   transform: scale(0.91);
   filter: brightness(1.3);
   box-shadow: 0 0 24px currentColor;
 }
 
+/* Default 4-Button Colors */
+.action-btn.btn-x { background: #0284c7; color: #ffffff; }
+.action-btn.btn-y { background: #16a34a; color: #ffffff; }
+.action-btn.btn-b { background: #eab308; color: #111827; }
+.action-btn.btn-a { background: #dc2626; color: #ffffff; }
+
+/* 2-Button Horizontal Layout (NES & GBA) */
+.action-two-btn {
+  display: flex;
+  gap: 28px;
+  align-items: center;
+}
+
+.action-two-btn.nes {
+  transform: rotate(-10deg);
+}
+
+.action-two-btn.gba {
+  transform: rotate(-16deg);
+}
+
+.action-two-btn .action-btn {
+  width: 64px;
+  height: 64px;
+  font-size: 1.4rem;
+}
+
+.btn-nes-b, .btn-nes-a {
+  background: #dc2626;
+  color: #ffffff;
+  box-shadow: 0 6px 16px rgba(220, 38, 38, 0.4), inset 0 2px 6px rgba(255, 255, 255, 0.3);
+}
+
+/* 3-Button Arc Layout (Sega Genesis) */
+.action-genesis-arc {
+  display: flex;
+  gap: 16px;
+  align-items: flex-end;
+  transform: rotate(-10deg);
+}
+
+.action-genesis-arc .action-btn {
+  width: 60px;
+  height: 60px;
+  font-size: 1.25rem;
+}
+
+.btn-gen-a { transform: translateY(8px); background: #262b35; color: #f8fafc; }
+.btn-gen-b { transform: translateY(0px); background: #262b35; color: #f8fafc; }
+.btn-gen-c { transform: translateY(8px); background: #262b35; color: #f8fafc; }
+
+/* PlayStation Geometric Diamond */
+.action-diamond.ps1-diamond .action-btn {
+  font-size: 1.4rem;
+  background: #1f242e;
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.btn-ps-triangle { color: #22c55e; border-color: rgba(34, 197, 94, 0.4); text-shadow: 0 0 10px rgba(34, 197, 94, 0.6); }
+.btn-ps-circle { color: #ef4444; border-color: rgba(239, 68, 68, 0.4); text-shadow: 0 0 10px rgba(239, 68, 68, 0.6); }
+.btn-ps-cross { color: #3b82f6; border-color: rgba(59, 130, 246, 0.4); text-shadow: 0 0 10px rgba(59, 130, 246, 0.6); }
+.btn-ps-square { color: #ec4899; border-color: rgba(236, 72, 153, 0.4); text-shadow: 0 0 10px rgba(236, 72, 153, 0.6); }
+
 /* ==========================================================================
-   Player 2 Theme Overrides
+   Console Skins Styling (Classic & Variant Themes)
    ========================================================================== */
 
-.mobile-gamepad-container.player-2 {
+/* NES Classic */
+.skin-nes-classic {
+  background: #8e939d;
   background-image: 
-    radial-gradient(circle at 50% 50%, rgba(55, 38, 20, 0.85), #07080a 90%);
+    linear-gradient(180deg, transparent 20%, #17181c 20%, #17181c 80%, transparent 80%),
+    radial-gradient(circle at 50% 50%, #8e939d 0%, #6e727c 100%);
+}
+.skin-nes-classic .dpad-btn { background: #1c1d22; border-color: #383a42; }
+.skin-nes-classic .pill-btn { background: #1c1d22; color: #ef4444; border-color: #383a42; }
+
+/* NES Famicom */
+.skin-nes-famicom {
+  background: #6e101b;
+  background-image: 
+    radial-gradient(circle at 50% 50%, #991b1b 0%, #450a0a 100%);
+}
+.skin-nes-famicom .dpad-btn { background: #0f1012; border-color: #d97706; }
+.skin-nes-famicom .btn-nes-b, .skin-nes-famicom .btn-nes-a {
+  background: #dc2626;
+  border-color: #fbbf24;
+  box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+}
+.skin-nes-famicom .pill-btn { background: #18191d; color: #fbbf24; border-color: #d97706; }
+
+/* SNES Classic US */
+.skin-snes-classic {
+  background: #8e939d;
+  background-image: radial-gradient(circle at 50% 50%, #9ba1ac 0%, #6b707a 100%);
+}
+.skin-snes-classic .action-btn.btn-x, .skin-snes-classic .action-btn.btn-y {
+  background: #c4b5fd;
+  color: #4c1d95;
+  box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.35); /* Concave feel */
+}
+.skin-snes-classic .action-btn.btn-a, .skin-snes-classic .action-btn.btn-b {
+  background: #6d28d9;
+  color: #ffffff;
+  box-shadow: 0 6px 16px rgba(109, 40, 217, 0.5), inset 0 2px 4px rgba(255, 255, 255, 0.3);
 }
 
-.mobile-gamepad-container.player-2 .shoulder-btn.active {
-  background: #f59e0b;
-  color: #0b0c10;
-  box-shadow: 0 0 20px #f59e0b;
+/* Super Famicom / PAL */
+.skin-snes-famicom {
+  background: #475569;
+  background-image: radial-gradient(circle at 50% 50%, #64748b 0%, #334155 100%);
+}
+.skin-snes-famicom .action-btn.btn-x { background: #2563eb; color: #ffffff; }
+.skin-snes-famicom .action-btn.btn-y { background: #eab308; color: #111827; }
+.skin-snes-famicom .action-btn.btn-b { background: #dc2626; color: #ffffff; }
+.skin-snes-famicom .action-btn.btn-a { background: #16a34a; color: #ffffff; }
+
+/* Sega Genesis Classic */
+.skin-genesis-classic {
+  background: #090a0d;
+  background-image: radial-gradient(circle at 50% 50%, #151821 0%, #050608 100%);
+}
+.skin-genesis-classic .genesis-dpad-ring { border-color: #dc2626; }
+.skin-genesis-classic .genesis-start-btn { background: #f8fafc; color: #090a0d; }
+
+/* Sega Genesis Arcade */
+.skin-genesis-arcade {
+  background: #0f121a;
+  background-image: radial-gradient(circle at 50% 50%, #1e2433 0%, #080a0f 100%);
+}
+.skin-genesis-arcade .genesis-dpad-ring { border-color: #38bdf8; }
+.skin-genesis-arcade .genesis-start-btn { background: #0284c7; color: #ffffff; }
+
+/* PlayStation 1 Classic Grey */
+.skin-ps1-classic {
+  background: #828792;
+  background-image: radial-gradient(circle at 50% 50%, #9ca3af 0%, #4b5563 100%);
+}
+.skin-ps1-classic .dpad-btn { background: #374151; border-color: #4b5563; }
+.skin-ps1-classic .shoulder-btn { background: #6b7280; color: #f3f4f6; }
+.skin-ps1-classic .action-diamond.ps1-diamond .action-btn { background: #374151; }
+
+/* PlayStation 1 Smoke Translucent */
+.skin-ps1-smoke {
+  background: #07090e;
+  background-image: radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.15) 0%, #030406 100%);
+}
+.skin-ps1-smoke .action-diamond.ps1-diamond .action-btn {
+  background: rgba(15, 23, 42, 0.8);
+  box-shadow: 0 0 20px currentColor;
 }
 
-.mobile-gamepad-container.player-2 .dpad-btn.active {
-  background: #f59e0b;
-  color: #0b0c10;
-  box-shadow: 0 0 18px #f59e0b;
+/* GBA Indigo */
+.skin-gba-classic {
+  background: #3730a3;
+  background-image: radial-gradient(circle at 50% 50%, #4f46e5 0%, #1e1b4b 100%);
+}
+.skin-gba-classic .dpad-btn { background: #9ca3af; color: #111827; }
+.skin-gba-classic .action-two-btn .action-btn { background: #1e1b4b; border-color: #6366f1; color: #ffffff; }
+
+/* GBA Glacier */
+.skin-gba-glacier {
+  background: #083344;
+  background-image: radial-gradient(circle at 50% 50%, rgba(56, 189, 248, 0.25) 0%, #041d26 100%);
+}
+.skin-gba-glacier .action-two-btn .action-btn { background: #164e63; border-color: #38bdf8; color: #f0fdfa; }
+
+/* ==========================================================================
+   Skin Selection Bottom Sheet Drawer
+   ========================================================================== */
+
+.skin-drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 10000;
+  display: flex;
+  align-items: flex-end;
+  animation: fadeIn 0.2s ease-out;
 }
 
-.mobile-gamepad-container.player-2 .pill-btn.active {
-  background: #f59e0b;
-  color: #0b0c10;
-  box-shadow: 0 0 16px #f59e0b;
+.skin-drawer {
+  width: 100%;
+  max-height: 85vh;
+  overflow-y: auto;
+  border-radius: 24px 24px 0 0;
+  padding: 1.5rem;
+  background: #0f1218;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-bottom: none;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.8);
+  animation: fadeInUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
+
+.skin-drawer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.drawer-title-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.drawer-title-wrapper h3 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.drawer-hint {
+  font-size: 0.8rem;
+  color: var(--secondary-color);
+  line-height: 1.4;
+  margin: 0;
+}
+
+.skin-console-card {
+  border-radius: 14px;
+  padding: 0.85rem 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.skin-console-card:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.skin-console-card.selected {
+  border-color: var(--primary-color);
+  background: rgba(102, 252, 241, 0.06);
+  box-shadow: 0 0 16px rgba(102, 252, 241, 0.15);
+}
+
+.skin-console-card.auto-sync-card {
+  border-style: dashed;
+}
+
+.card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.console-title {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--text-light);
+}
+
+.active-tag {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  background: rgba(102, 252, 241, 0.15);
+  padding: 0.2rem 0.5rem;
+  border-radius: 20px;
+}
+
+.card-sub {
+  font-size: 0.75rem;
+  color: var(--secondary-color);
+}
+
+.skin-console-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-height: 48vh;
+  overflow-y: auto;
+  padding-right: 0.25rem;
+}
+
+.skin-variant-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.variant-chip {
+  flex: 1;
+  padding: 0.45rem 0.65rem;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-light);
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.variant-chip:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.variant-chip.active {
+  background: rgba(102, 252, 241, 0.2);
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+  box-shadow: 0 0 10px rgba(102, 252, 241, 0.2);
+}
+
+.chip-badge {
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+}
+
+.chip-badge.variant {
+  background: rgba(245, 158, 11, 0.25);
+  color: #f59e0b;
+}
+
+.skin-drawer-footer {
+  margin-top: 0.5rem;
+}
+
 
 
 

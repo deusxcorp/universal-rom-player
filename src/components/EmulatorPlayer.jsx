@@ -19,6 +19,7 @@ import { generateRoomId, createHostSession } from '../utils/inputRemote';
 import ControlsModal from './ControlsModal';
 import PhonePairingModal from './PhonePairingModal';
 import { getAllBiosFiles, getDualShockEnabled } from '../utils/biosManager';
+import { coreToConsole } from '../utils/controllerSkins';
 
 export default function EmulatorPlayer({ core, romFiles, onQuit }) {
   const canvasRef = useRef(null);
@@ -82,6 +83,7 @@ export default function EmulatorPlayer({ core, romFiles, onQuit }) {
 
   // WebRTC Host Session for Remote Phone Controllers (Up to 2 players)
   useEffect(() => {
+    const consoleType = coreToConsole(core);
     const session = createHostSession(roomId, {
       onPlayersChange: (status) => {
         setConnectedPlayers(status);
@@ -99,14 +101,14 @@ export default function EmulatorPlayer({ core, romFiles, onQuit }) {
           console.warn('Error applying remote input:', err);
         }
       },
-    });
+    }, consoleType);
 
     hostSessionRef.current = session;
 
     return () => {
       session.destroy();
     };
-  }, [roomId]);
+  }, [roomId, core]);
 
   useEffect(() => {
     let active = true;

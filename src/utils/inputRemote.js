@@ -11,10 +11,12 @@ export function generateRoomId() {
 
 /**
  * Initializes the Host session on the laptop emulator.
- * Supports up to 2 simultaneous phone controllers (Player 1 and Player 2).
+ * Supports up to 2 simultaneous phone controllers (Player 1 and Player 2)
+ * and broadcasts the loaded game's console type for adaptive controller skins.
  */
-export function createHostSession(roomId, callbacks = {}) {
+export function createHostSession(roomId, callbacks = {}, initialConsoleType = 'snes') {
   const { onReady, onPlayersChange, onInput, onError } = callbacks;
+  let currentConsoleType = initialConsoleType;
 
   const playerConnections = {
     1: null,
@@ -64,11 +66,12 @@ export function createHostSession(roomId, callbacks = {}) {
     playerConnections[assignedSlot] = conn;
 
     conn.on('open', () => {
-      // Send handshake identifying assigned player slot
+      // Send handshake identifying assigned player slot and loaded game console
       conn.send({
         type: 'handshake',
         player: assignedSlot,
         roomId,
+        consoleType: currentConsoleType,
       });
       notifyPlayersChange();
     });
@@ -101,6 +104,17 @@ export function createHostSession(roomId, callbacks = {}) {
   });
 
   return {
+    setConsoleType: (newType) => {
+      currentConsoleType = newType;
+      [1, 2].forEach((slot) => {
+        if (playerConnections[slot] && playerConnections[slot].open) {
+          playerConnections[slot].send({
+            type: 'console_change',
+            consoleType: newType,
+          });
+        }
+      });
+    },
     destroy: () => {
       [1, 2].forEach((slot) => {
         if (playerConnections[slot]) {
@@ -122,7 +136,7 @@ export function createHostSession(roomId, callbacks = {}) {
  * Initializes the Client controller session on the mobile device.
  */
 export function createClientSession(roomId, callbacks = {}) {
-  const { onConnected, onDisconnected, onPlayerAssigned, onError } = callbacks;
+  const { onConnected, onDisconnected, onPlayerAssigned, onConsoleChange, onError } = callbacks;
 
   let conn = null;
   const peer = new Peer({
@@ -139,8 +153,11 @@ export function createClientSession(roomId, callbacks = {}) {
     });
 
     conn.on('data', (data) => {
-      if (data && data.type === 'handshake' && data.player) {
-        if (onPlayerAssigned) onPlayerAssigned(data.player);
+      if (data && data.type === 'handshake') {
+        if (data.player && onPlayerAssigned) onPlayerAssigned(data.player);
+        if (data.consoleType && onConsoleChange) onConsoleChange(data.consoleType);
+      } else if (data && data.type === 'console_change') {
+        if (data.consoleType && onConsoleChange) onConsoleChange(data.consoleType);
       } else if (data && data.type === 'room_full') {
         if (onError) onError(new Error(data.message || 'Room is full'));
       }
