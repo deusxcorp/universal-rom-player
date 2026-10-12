@@ -18,6 +18,7 @@ import { getSavedInputConfig, formatKeyDisplay } from '../utils/inputMap';
 import { generateRoomId, createHostSession } from '../utils/inputRemote';
 import ControlsModal from './ControlsModal';
 import PhonePairingModal from './PhonePairingModal';
+import { getAllBiosFiles, getDualShockEnabled } from '../utils/biosManager';
 
 export default function EmulatorPlayer({ core, romFiles, onQuit }) {
   const canvasRef = useRef(null);
@@ -117,16 +118,27 @@ export default function EmulatorPlayer({ core, romFiles, onQuit }) {
         }
 
         const inputConfig = getSavedInputConfig();
+        const storedBiosList = await getAllBiosFiles();
+        const isDualShock = getDualShockEnabled();
 
-        const nostalgist = await Nostalgist.launch({
+        const retroarchConfig = {
+          ...inputConfig,
+          ...(isDualShock ? { input_libretro_device_p1: 517, input_libretro_device_p2: 517 } : {}),
+        };
+
+        const launchOptions = {
           core,
           rom: romFiles,
           element: canvasRef.current,
           size: { width: 800, height: 600 },
-          retroarchConfig: {
-            ...inputConfig
-          }
-        });
+          retroarchConfig,
+        };
+
+        if (storedBiosList && storedBiosList.length > 0) {
+          launchOptions.bios = storedBiosList;
+        }
+
+        const nostalgist = await Nostalgist.launch(launchOptions);
 
         if (active) {
           nostalgistRef.current = nostalgist;
