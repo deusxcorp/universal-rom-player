@@ -1,6 +1,19 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Nostalgist } from 'nostalgist';
-import { Play, Pause, Save, Download, XCircle, Maximize, Minimize, Gamepad2, Smartphone, Users } from 'lucide-react';
+import { 
+  Play, 
+  Pause, 
+  Save, 
+  Download, 
+  XCircle, 
+  Maximize, 
+  Minimize, 
+  Gamepad2, 
+  Smartphone, 
+  Users, 
+  SlidersHorizontal, 
+  X 
+} from 'lucide-react';
 import { getSavedInputConfig, formatKeyDisplay } from '../utils/inputMap';
 import { generateRoomId, createHostSession } from '../utils/inputRemote';
 import ControlsModal from './ControlsModal';
@@ -18,6 +31,11 @@ export default function EmulatorPlayer({ core, romFiles, onQuit }) {
   const [controlsConfig, setControlsConfig] = useState(getSavedInputConfig());
   const [showControlsModal, setShowControlsModal] = useState(false);
 
+  // Fullscreen HUD overlay state
+  const [isFullscreenHudOpen, setIsFullscreenHudOpen] = useState(false);
+  const [isMouseIdle, setIsMouseIdle] = useState(false);
+  const mouseTimerRef = useRef(null);
+
   // Mobile Remote Controller State (Multi-Player P1 & P2)
   const [roomId] = useState(() => generateRoomId());
   const [connectedPlayers, setConnectedPlayers] = useState({ player1: false, player2: false, count: 0 });
@@ -26,11 +44,40 @@ export default function EmulatorPlayer({ core, romFiles, onQuit }) {
 
   useEffect(() => {
     const handleFullscreenChange = () => {
-      setIsFullscreen(!!document.fullscreenElement);
+      const active = !!document.fullscreenElement;
+      setIsFullscreen(active);
+      if (!active) {
+        setIsFullscreenHudOpen(false);
+        setIsMouseIdle(false);
+      }
     };
     document.addEventListener('fullscreenchange', handleFullscreenChange);
     return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
   }, []);
+
+  // Mouse idle detection in fullscreen mode (auto-fade HUD & cursor)
+  useEffect(() => {
+    if (!isFullscreen) {
+      setIsMouseIdle(false);
+      setIsFullscreenHudOpen(false);
+      return;
+    }
+
+    const resetMouseTimer = () => {
+      setIsMouseIdle(false);
+      if (mouseTimerRef.current) clearTimeout(mouseTimerRef.current);
+      mouseTimerRef.current = setTimeout(() => {
+        setIsMouseIdle(true);
+      }, 2500);
+    };
+
+    resetMouseTimer();
+    window.addEventListener('mousemove', resetMouseTimer);
+    return () => {
+      window.removeEventListener('mousemove', resetMouseTimer);
+      if (mouseTimerRef.current) clearTimeout(mouseTimerRef.current);
+    };
+  }, [isFullscreen]);
 
   // WebRTC Host Session for Remote Phone Controllers (Up to 2 players)
   useEffect(() => {
@@ -84,6 +131,13 @@ export default function EmulatorPlayer({ core, romFiles, onQuit }) {
         if (active) {
           nostalgistRef.current = nostalgist;
           setLoading(false);
+
+          // Auto-fullscreen on game load
+          try {
+            if (containerRef.current && !document.fullscreenElement) {
+              containerRef.current.requestFullscreen().catch(() => {});
+            }
+          } catch (e) {}
         } else {
           try { nostalgist.exit(); } catch(e) {}
         }
@@ -190,8 +244,74 @@ export default function EmulatorPlayer({ core, romFiles, onQuit }) {
     );
   }
 
+  const renderControlButtons = () => (
+    <>
+      <button className="control-btn" onClick={handlePauseResume} title={isPaused ? 'Resume Game' : 'Pause Game'}>
+        {isPaused ? <Play size={15} /> : <Pause size={15} />}
+        <span>{isPaused ? 'Resume' : 'Pause'}</span>
+      </button>
+      
+      <button className="control-btn" onClick={handleSaveState} title="Save current progress">
+        <Save size={15} />
+        <span>Save State</span>
+      </button>
+      
+      <button 
+        className="control-btn" 
+        onClick={handleLoadState}
+        disabled={!saveState}
+        style={{ opacity: !saveState ? 0.45 : 1, cursor: !saveState ? 'not-allowed' : 'pointer' }}
+        title="Load saved progress"
+      >
+        <Download size={15} />
+        <span>Load State</span>
+      </button>
+      
+      <button className="control-btn" onClick={toggleFullscreen} title={isFullscreen ? 'Exit Fullscreen' : 'Enable Fullscreen'}>
+        {isFullscreen ? <Minimize size={15} /> : <Maximize size={15} />}
+        <span>{isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}</span>
+      </button>
+
+      <button className="control-btn" onClick={() => setShowControlsModal(true)} title="Customize Controller">
+        <Gamepad2 size={15} />
+        <span>Controls</span>
+      </button>
+
+      <button 
+        className={`control-btn ${connectedPlayers.count > 0 ? 'remote-active' : ''}`}
+        onClick={() => setShowPairingModal(true)}
+        title="Use phone as game controller"
+      >
+        {connectedPlayers.count >= 2 ? (
+          <>
+            <Users size={15} />
+            <span>2 Phones</span>
+          </>
+        ) : connectedPlayers.count === 1 ? (
+          <>
+            <Smartphone size={15} />
+            <span>1 Phone</span>
+          </>
+        ) : (
+          <>
+            <Smartphone size={15} />
+            <span>Phone</span>
+          </>
+        )}
+      </button>
+      
+      <button className="control-btn danger" onClick={handleQuit} title="Exit to game select">
+        <XCircle size={15} />
+        <span>Quit Game</span>
+      </button>
+    </>
+  );
+
   return (
-    <div className="player-container" ref={containerRef}>
+    <div 
+      className={`player-container ${isFullscreen && isMouseIdle && !isFullscreenHudOpen ? 'mouse-idle' : ''}`} 
+      ref={containerRef}
+    >
       <div className="canvas-wrapper glass-panel">
         {loading && (
           <div className="loading-overlay">
@@ -202,64 +322,32 @@ export default function EmulatorPlayer({ core, romFiles, onQuit }) {
         <canvas ref={canvasRef} id="emulator-canvas" tabIndex="0"></canvas>
       </div>
       
-      {!loading && (
+      {/* Non-fullscreen Player Controls (Single Horizontal Row) */}
+      {!loading && !isFullscreen && (
         <div className="player-controls glass-panel">
-          <button className="control-btn" onClick={handlePauseResume}>
-            {isPaused ? <Play size={18} /> : <Pause size={18} />}
-            {isPaused ? 'Resume' : 'Pause'}
-          </button>
-          
-          <button className="control-btn" onClick={handleSaveState}>
-            <Save size={18} /> Save State
-          </button>
-          
-          <button 
-            className="control-btn" 
-            onClick={handleLoadState}
-            disabled={!saveState}
-            style={{ opacity: !saveState ? 0.5 : 1, cursor: !saveState ? 'not-allowed' : 'pointer' }}
-          >
-            <Download size={18} /> Load State
-          </button>
-          
-          <button className="control-btn" onClick={toggleFullscreen}>
-            {isFullscreen ? <Minimize size={18} /> : <Maximize size={18} />}
-            {isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}
-          </button>
-
-          <button className="control-btn" onClick={() => setShowControlsModal(true)}>
-            <Gamepad2 size={18} /> Controls
-          </button>
-
-          <button 
-            className={`control-btn ${connectedPlayers.count > 0 ? 'remote-active' : ''}`}
-            onClick={() => setShowPairingModal(true)}
-            title="Use phone as game controller"
-          >
-            {connectedPlayers.count >= 2 ? (
-              <>
-                <Users size={18} />
-                2 Phones (P1+P2)
-              </>
-            ) : connectedPlayers.count === 1 ? (
-              <>
-                <Smartphone size={18} />
-                1 Phone (P1)
-              </>
-            ) : (
-              <>
-                <Smartphone size={18} />
-                Phone
-              </>
-            )}
-          </button>
-          
-          <button className="control-btn danger" onClick={handleQuit}>
-            <XCircle size={18} /> Quit Game
-          </button>
+          {renderControlButtons()}
         </div>
       )}
 
+      {/* Fullscreen Discreet HUD & Floating Action Button (Zero in-game obstruction) */}
+      {!loading && isFullscreen && (
+        <>
+          <button 
+            className={`fullscreen-hud-fab ${isMouseIdle && !isFullscreenHudOpen ? 'idle' : ''} ${isFullscreenHudOpen ? 'open' : ''}`}
+            onClick={() => setIsFullscreenHudOpen(!isFullscreenHudOpen)}
+            title={isFullscreenHudOpen ? 'Hide Menu' : 'Game Menu'}
+            aria-label="Toggle game menu"
+          >
+            {isFullscreenHudOpen ? <X size={20} /> : <SlidersHorizontal size={20} />}
+          </button>
+
+          <div className={`fullscreen-hud-dock glass-panel ${isFullscreenHudOpen ? 'visible' : ''}`}>
+            {renderControlButtons()}
+          </div>
+        </>
+      )}
+
+      {/* Non-fullscreen Controls Guide (Single Balanced Row with Dividers) */}
       {!loading && !isFullscreen && (
         <div className="controls-guide glass-panel">
           <div className="guide-item">
@@ -269,6 +357,9 @@ export default function EmulatorPlayer({ core, romFiles, onQuit }) {
             <span className="key-badge">{formatKeyDisplay(controlsConfig.input_player1_left)}</span>
             <span className="key-badge">{formatKeyDisplay(controlsConfig.input_player1_right)}</span>
           </div>
+
+          <div className="guide-divider" />
+
           <div className="guide-item">
             <span className="guide-label">Action:</span>
             <span className="key-badge highlight">{formatKeyDisplay(controlsConfig.input_player1_y)}</span>
@@ -276,11 +367,17 @@ export default function EmulatorPlayer({ core, romFiles, onQuit }) {
             <span className="key-badge highlight">{formatKeyDisplay(controlsConfig.input_player1_a)}</span>
             <span className="key-badge highlight">{formatKeyDisplay(controlsConfig.input_player1_x)}</span>
           </div>
+
+          <div className="guide-divider" />
+
           <div className="guide-item">
             <span className="guide-label">Shoulders:</span>
             <span className="key-badge">{formatKeyDisplay(controlsConfig.input_player1_l)}</span>
             <span className="key-badge">{formatKeyDisplay(controlsConfig.input_player1_r)}</span>
           </div>
+
+          <div className="guide-divider" />
+
           <div className="guide-item">
             <span className="guide-label">System:</span>
             <span className="key-badge">{formatKeyDisplay(controlsConfig.input_player1_select)}</span>

@@ -194,27 +194,50 @@ button {
 
 .player-controls {
   display: flex;
-  justify-content: center;
-  gap: 1rem;
-  flex-wrap: wrap;
-  padding: 1rem;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: nowrap;
+  padding: 0.65rem 0.85rem;
+  width: 100%;
+  box-sizing: border-box;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.player-controls::-webkit-scrollbar {
+  display: none;
 }
 
 .control-btn {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1.5rem;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.55rem 0.75rem;
   background: rgba(255, 255, 255, 0.05);
   color: var(--text-light);
   border-radius: var(--border-radius-md);
   border: 1px solid rgba(255, 255, 255, 0.1);
   font-weight: 500;
+  font-size: 0.82rem;
+  white-space: nowrap;
+  flex: 1 1 0px;
+  min-width: 0;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
 }
 
 .control-btn:hover {
   background: rgba(255, 255, 255, 0.1);
   transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.control-btn span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .control-btn.danger {
@@ -225,6 +248,7 @@ button {
 
 .control-btn.danger:hover {
   background: rgba(255, 76, 76, 0.2);
+  border-color: rgba(255, 76, 76, 0.4);
 }
 
 .loading-overlay {
@@ -290,7 +314,7 @@ button {
   width: 100vw;
   height: 100vh;
   margin: 0;
-  background: var(--bg-color);
+  background: #000;
   padding: 0;
   justify-content: center;
 }
@@ -301,59 +325,150 @@ button {
   border-radius: 0;
   border: none;
   height: 100%;
+  width: 100%;
+  box-shadow: none;
 }
 
-.player-container:fullscreen .player-controls {
-  position: absolute;
+.player-container.mouse-idle,
+.player-container.mouse-idle * {
+  cursor: none !important;
+}
+
+/* Fullscreen Floating Action Button (FAB) */
+.fullscreen-hud-fab {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(15, 20, 28, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(102, 252, 241, 0.35);
+  color: var(--primary-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 9999;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6), 0 0 16px rgba(102, 252, 241, 0.25);
+  transition: opacity 0.35s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.fullscreen-hud-fab:hover {
+  background: rgba(25, 32, 45, 0.95);
+  border-color: var(--primary-color);
+  transform: scale(1.08);
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.7), 0 0 24px rgba(102, 252, 241, 0.45);
+}
+
+.fullscreen-hud-fab.open {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.6);
+  color: #f87171;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6), 0 0 16px rgba(239, 68, 68, 0.3);
+}
+
+.fullscreen-hud-fab.idle {
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.9);
+}
+
+/* Fullscreen Slide-Up HUD Dock */
+.fullscreen-hud-dock {
+  position: fixed;
   bottom: 2rem;
   left: 50%;
-  transform: translateX(-50%);
-  z-index: 10;
-  background: rgba(11, 12, 16, 0.85);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  opacity: 0.2;
-  transition: opacity 0.3s ease;
+  transform: translateX(-50%) translateY(140%);
+  z-index: 9998;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1rem;
+  background: rgba(11, 14, 20, 0.92);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 999px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.75), 0 0 25px rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+  max-width: 90vw;
+  box-sizing: border-box;
 }
 
-.player-container:fullscreen .player-controls:hover {
+.fullscreen-hud-dock.visible {
+  transform: translateX(-50%) translateY(0);
   opacity: 1;
+  pointer-events: auto;
 }
 
-/* Controls Guide */
+.fullscreen-hud-dock .control-btn {
+  border-radius: 999px;
+  padding: 0.5rem 0.85rem;
+  font-size: 0.8rem;
+  flex: 0 0 auto;
+}
+
+/* Controls Guide (Single Balanced Row with Dividers) */
 .controls-guide {
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 1rem;
-  padding: 0.8rem 1.5rem;
-  font-size: 0.85rem;
+  flex-wrap: nowrap;
+  gap: 0.5rem;
+  padding: 0.65rem 1.25rem;
+  font-size: 0.8rem;
   border-radius: var(--border-radius-md);
   color: var(--secondary-color);
+  width: 100%;
+  box-sizing: border-box;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.controls-guide::-webkit-scrollbar {
+  display: none;
 }
 
 .guide-item {
   display: flex;
   align-items: center;
   gap: 0.35rem;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.guide-divider {
+  width: 1px;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.12);
+  flex-shrink: 0;
 }
 
 .guide-label {
   font-weight: 600;
   margin-right: 0.25rem;
   color: var(--text-light);
+  font-size: 0.76rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .key-badge {
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.15);
-  padding: 0.2rem 0.5rem;
-  border-radius: 6px;
+  padding: 0.15rem 0.45rem;
+  border-radius: 5px;
   font-family: monospace;
   font-weight: 700;
+  font-size: 0.75rem;
   color: #fff;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  white-space: nowrap;
 }
 
 .key-badge.highlight {
