@@ -597,4 +597,481 @@ button {
   transform: translateY(-2px);
 }
 
+/* ==========================================================================
+   Phone Pairing Modal & Remote Controller Styles
+   ========================================================================== */
+
+.pairing-modal {
+  max-width: 460px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: var(--border-radius-lg);
+  position: relative;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 35px rgba(102, 252, 241, 0.15);
+  animation: fadeInUp 0.3s ease-out forwards;
+}
+
+.pairing-content {
+  padding: 1.5rem 1.75rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.pairing-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.45rem 1.1rem;
+  border-radius: 20px;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.status-dot.connected {
+  background: #22c55e;
+  box-shadow: 0 0 10px #22c55e;
+  animation: statusPulse 2s infinite ease-in-out;
+}
+
+.status-dot.waiting {
+  background: #eab308;
+  box-shadow: 0 0 10px #eab308;
+  animation: statusPulse 1.5s infinite ease-in-out;
+}
+
+@keyframes statusPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.25);
+    opacity: 0.7;
+  }
+}
+
+.status-text.connected {
+  color: #22c55e;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.status-text.waiting {
+  color: #eab308;
+  font-weight: 500;
+  font-size: 0.85rem;
+}
+
+.qr-container {
+  background: #ffffff;
+  padding: 12px;
+  border-radius: 18px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.qr-image {
+  width: 220px;
+  height: 220px;
+  display: block;
+  border-radius: 8px;
+}
+
+.qr-placeholder {
+  width: 220px;
+  height: 220px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #555;
+  font-size: 0.85rem;
+}
+
+.pairing-pin-box {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(102, 252, 241, 0.3);
+  padding: 0.5rem 1.4rem;
+  border-radius: 12px;
+}
+
+.pin-label {
+  font-size: 0.8rem;
+  color: var(--secondary-color);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+
+.pin-code {
+  font-family: monospace;
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--primary-color);
+  letter-spacing: 0.12em;
+}
+
+.pairing-link-row {
+  display: flex;
+  width: 100%;
+  gap: 0.5rem;
+}
+
+.pairing-url-input {
+  flex: 1;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: var(--text-main);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.8rem;
+  font-family: monospace;
+  outline: none;
+}
+
+.pairing-url-input:focus {
+  border-color: var(--primary-color);
+}
+
+.pairing-features-hint {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  font-size: 0.75rem;
+  color: var(--secondary-color);
+  margin-top: 0.2rem;
+}
+
+/* Active glowing state for Toolbar Remote Button */
+.control-btn.remote-active {
+  border-color: #22c55e;
+  background: rgba(34, 197, 94, 0.15);
+  color: #4ade80;
+  box-shadow: 0 0 14px rgba(34, 197, 94, 0.35);
+}
+
+/* ==========================================================================
+   Mobile Gamepad View
+   ========================================================================== */
+
+.mobile-gamepad-container {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100dvh;
+  background: #0b0c10;
+  background-image: 
+    radial-gradient(circle at 50% 50%, rgba(31, 40, 51, 0.85), #07080a 90%);
+  display: flex;
+  flex-direction: column;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  overflow: hidden;
+  z-index: 9999;
+}
+
+.mobile-controller-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100dvh;
+  padding: 2rem;
+  text-align: center;
+  color: var(--text-light);
+  background: #0b0c10;
+}
+
+.mobile-controller-error h2 {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.error-hint {
+  font-size: 0.85rem;
+  color: var(--secondary-color);
+  margin-top: 0.5rem;
+  max-width: 320px;
+}
+
+.gamepad-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.65rem 1.25rem;
+  background: rgba(0, 0, 0, 0.5);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  flex-shrink: 0;
+}
+
+.connection-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.35rem 0.8rem;
+  border-radius: 16px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-light);
+}
+
+.topbar-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.topbar-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  color: var(--text-light);
+  font-size: 0.75rem;
+  padding: 0.35rem 0.65rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  touch-action: manipulation;
+  transition: background 0.15s ease;
+}
+
+.topbar-btn:active {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Shoulder Buttons */
+.gamepad-shoulders {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1.5rem 0.25rem;
+  flex-shrink: 0;
+}
+
+.shoulder-btn {
+  flex: 0 0 38%;
+  height: 52px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.04));
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 14px;
+  color: var(--text-light);
+  font-weight: 800;
+  font-size: 1.15rem;
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+  touch-action: none;
+  transition: transform 0.08s ease, background 0.08s ease, box-shadow 0.08s ease;
+}
+
+.shoulder-btn.active {
+  background: var(--primary-color);
+  color: #0b0c10;
+  transform: scale(0.96);
+  box-shadow: 0 0 20px var(--primary-color);
+}
+
+.shoulder-spacer {
+  flex: 1;
+}
+
+/* Main Body with D-Pad, Center, and Actions */
+.gamepad-main-body {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 1rem 1.5rem;
+  gap: 0.5rem;
+}
+
+/* D-Pad Styling */
+.dpad-zone {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.dpad-cross {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  user-select: none;
+}
+
+.dpad-middle-row {
+  display: flex;
+  align-items: center;
+}
+
+.dpad-center {
+  width: 54px;
+  height: 54px;
+  background: #191e25;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.dpad-btn {
+  width: 54px;
+  height: 54px;
+  background: #242a34;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: var(--text-light);
+  font-size: 1.3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  touch-action: none;
+  box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.1), 0 4px 10px rgba(0, 0, 0, 0.5);
+  transition: background 0.08s ease, transform 0.08s ease;
+}
+
+.dpad-btn.up {
+  border-radius: 12px 12px 0 0;
+}
+
+.dpad-btn.down {
+  border-radius: 0 0 12px 12px;
+}
+
+.dpad-btn.left {
+  border-radius: 12px 0 0 12px;
+}
+
+.dpad-btn.right {
+  border-radius: 0 12px 12px 0;
+}
+
+.dpad-btn.active {
+  background: var(--primary-color);
+  color: #0b0c10;
+  transform: scale(0.93);
+  box-shadow: 0 0 18px var(--primary-color);
+}
+
+/* Center Select / Start */
+.center-zone {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  align-items: center;
+  justify-content: center;
+  padding: 0 0.5rem;
+}
+
+.pill-btn {
+  width: 68px;
+  height: 28px;
+  border-radius: 14px;
+  background: #282f3a;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #94a3b8;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  touch-action: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  transform: rotate(-25deg);
+  transition: transform 0.08s ease, background 0.08s ease;
+}
+
+.pill-btn.active {
+  background: var(--primary-color);
+  color: #0b0c10;
+  transform: rotate(-25deg) scale(0.92);
+  box-shadow: 0 0 16px var(--primary-color);
+}
+
+/* Action Diamond Buttons */
+.action-zone {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.action-diamond {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  user-select: none;
+}
+
+.action-middle-row {
+  display: flex;
+  gap: 36px;
+  align-items: center;
+  margin: -6px 0;
+}
+
+.action-btn {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  font-weight: 800;
+  font-size: 1.3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  touch-action: none;
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.6), inset 0 2px 5px rgba(255, 255, 255, 0.3);
+  transition: transform 0.08s ease, box-shadow 0.08s ease, filter 0.08s ease;
+}
+
+.action-btn.btn-x {
+  background: #0284c7;
+  color: #ffffff;
+}
+
+.action-btn.btn-y {
+  background: #16a34a;
+  color: #ffffff;
+}
+
+.action-btn.btn-b {
+  background: #eab308;
+  color: #111827;
+}
+
+.action-btn.btn-a {
+  background: #dc2626;
+  color: #ffffff;
+}
+
+.action-btn.active {
+  transform: scale(0.91);
+  filter: brightness(1.3);
+  box-shadow: 0 0 24px currentColor;
+}
+
+
 

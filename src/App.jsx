@@ -1,13 +1,29 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Gamepad2 } from 'lucide-react';
 import RomUploader from './components/RomUploader';
 import EmulatorPlayer from './components/EmulatorPlayer';
 import ControlsModal from './components/ControlsModal';
+import MobileController from './components/MobileController';
 import './index.css';
 
 function App() {
   const [currentRomState, setCurrentRomState] = useState(null);
   const [isControlsOpen, setIsControlsOpen] = useState(false);
+  const [controllerRoom, setControllerRoom] = useState(null);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const room = params.get('controller');
+      if (room) {
+        setControllerRoom(room.toUpperCase());
+      }
+    }
+  }, []);
+
+  if (controllerRoom) {
+    return <MobileController roomId={controllerRoom} />;
+  }
 
   const handleRomLoad = (core, files) => {
     setCurrentRomState({ core, files });
