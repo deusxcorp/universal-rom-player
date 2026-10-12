@@ -239,7 +239,7 @@ export default function EmulatorPlayer({ core, romFiles, onQuit }) {
             title="Use phone as game controller"
           >
             <Smartphone size={18} />
-            {isRemoteConnected ? '📱 Phone Active' : '📱 Phone'}
+            {isRemoteConnected ? 'Phone Active' : 'Phone'}
           </button>
           
           <button className="control-btn danger" onClick={handleQuit}>
