@@ -1,0 +1,130 @@
+/**
+ * consoleBootThemes.js
+ * Per-console cinematic boot sequence configurations.
+ * Each theme defines the visual style, timing, and logo for the boot overlay.
+ */
+
+export const bootThemes = {
+  nes: {
+    consoleName: 'Nintendo',
+    subName: 'Entertainment System',
+    accentColor: '#e60012',
+    glowColor: 'rgba(230, 0, 18, 0.6)',
+    bgColor: '#1a0000',
+    logoChar: 'NES',
+    powerLedColor: '#ff3030',
+    scanlineIntensity: 0.85,
+    bootDuration: 2400,
+    logoStyle: 'block',
+  },
+  snes: {
+    consoleName: 'Super Nintendo',
+    subName: 'Entertainment System',
+    accentColor: '#7b5ea7',
+    glowColor: 'rgba(123, 94, 167, 0.7)',
+    bgColor: '#0d0818',
+    logoChar: 'SNES',
+    powerLedColor: '#a060ff',
+    scanlineIntensity: 0.7,
+    bootDuration: 2600,
+    logoStyle: 'block',
+  },
+  gba: {
+    consoleName: 'Game Boy',
+    subName: 'Advance',
+    accentColor: '#8080c0',
+    glowColor: 'rgba(120, 100, 200, 0.6)',
+    bgColor: '#060612',
+    logoChar: 'GBA',
+    powerLedColor: '#6688ff',
+    scanlineIntensity: 0.6,
+    bootDuration: 2000,
+    logoStyle: 'compact',
+  },
+  gb: {
+    consoleName: 'Game Boy',
+    subName: '',
+    accentColor: '#8bac0f',
+    glowColor: 'rgba(139, 172, 15, 0.5)',
+    bgColor: '#0b0f04',
+    logoChar: 'GB',
+    powerLedColor: '#9bbc0f',
+    scanlineIntensity: 0.9,
+    bootDuration: 1800,
+    logoStyle: 'compact',
+  },
+  genesis: {
+    consoleName: 'Sega',
+    subName: 'Genesis',
+    accentColor: '#00a0e9',
+    glowColor: 'rgba(0, 160, 233, 0.6)',
+    bgColor: '#000d1a',
+    logoChar: 'SEGA',
+    powerLedColor: '#00ccff',
+    scanlineIntensity: 0.75,
+    bootDuration: 2200,
+    logoStyle: 'wide',
+  },
+  ps1: {
+    consoleName: 'PlayStation',
+    subName: '',
+    accentColor: '#00439c',
+    glowColor: 'rgba(0, 67, 156, 0.7)',
+    bgColor: '#00010f',
+    logoChar: 'PS',
+    powerLedColor: '#0066ff',
+    scanlineIntensity: 0.65,
+    bootDuration: 3000,
+    logoStyle: 'ps',
+  },
+  arcade: {
+    consoleName: 'Arcade',
+    subName: 'MAME',
+    accentColor: '#ff6a00',
+    glowColor: 'rgba(255, 106, 0, 0.6)',
+    bgColor: '#0f0500',
+    logoChar: 'MAME',
+    powerLedColor: '#ff8800',
+    scanlineIntensity: 0.9,
+    bootDuration: 2000,
+    logoStyle: 'wide',
+  },
+  universal: {
+    consoleName: 'ROM Player',
+    subName: 'Universal',
+    accentColor: '#66fcf1',
+    glowColor: 'rgba(102, 252, 241, 0.5)',
+    bgColor: '#030f0e',
+    logoChar: 'PLAY',
+    powerLedColor: '#66fcf1',
+    scanlineIntensity: 0.6,
+    bootDuration: 2000,
+    logoStyle: 'block',
+  },
+};
+
+/** Map a libretro core name to a boot theme key */
+const CORE_TO_THEME = {
+  fceumm: 'nes', nestopia: 'nes',
+  snes9x: 'snes', snes9x2010: 'snes',
+  gambatte: 'gb',
+  mgba: 'gba', vba_next: 'gba',
+  mednafen_vb: 'gba',
+  genesis_plus_gx: 'genesis', picodrive: 'genesis',
+  gearsystem: 'genesis',
+  pcsx_rearmed: 'ps1',
+  mednafen_pce_fast: 'genesis',
+  mednafen_ngp: 'gba',
+  mednafen_wswan: 'gba',
+  stella2014: 'universal',
+  prosystem: 'universal',
+  handy: 'gba',
+  gearcoleco: 'universal',
+  mame2003_plus: 'arcade',
+  tic80: 'universal',
+};
+
+export function getBootTheme(core) {
+  const key = CORE_TO_THEME[core] || 'universal';
+  return bootThemes[key] || bootThemes.universal;
+}
