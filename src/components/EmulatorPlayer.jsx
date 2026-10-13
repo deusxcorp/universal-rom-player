@@ -15,13 +15,14 @@ import {
   X 
 } from 'lucide-react';
 import { getSavedInputConfig, formatKeyDisplay } from '../utils/inputMap';
-import { generateRoomId, createHostSession } from '../utils/inputRemote';
 import ControlsModal from './ControlsModal';
 import PhonePairingModal from './PhonePairingModal';
 import { getAllBiosFiles, getDualShockEnabled } from '../utils/biosManager';
 import { coreToConsole } from '../utils/controllerSkins';
 
-export default function EmulatorPlayer({ core, romFiles, onQuit }) {
+const NO_PLAYERS = { player1: false, player2: false, count: 0 };
+
+export default function EmulatorPlayer({ core, romFiles, onQuit, remote }) {
   const canvasRef = useRef(null);
   const nostalgistRef = useRef(null);
   const containerRef = useRef(null);
@@ -38,11 +39,13 @@ export default function EmulatorPlayer({ core, romFiles, onQuit }) {
   const [isMouseIdle, setIsMouseIdle] = useState(false);
   const mouseTimerRef = useRef(null);
 
-  // Mobile Remote Controller State (Multi-Player P1 & P2)
-  const [roomId] = useState(() => generateRoomId());
-  const [connectedPlayers, setConnectedPlayers] = useState({ player1: false, player2: false, count: 0 });
+  // Mobile Remote Controller State (Multi-Player P1 & P2).
+  // The host session itself is owned by App so phones stay paired across games.
+  const roomId = remote?.roomId;
+  const connectedPlayers = remote?.connectedPlayers || NO_PLAYERS;
+  const setRemoteInputHandler = remote?.setInputHandler;
+  const setRemoteGameState = remote?.setGameState;
   const [showPairingModal, setShowPairingModal] = useState(false);
-  const hostSessionRef = useRef(null);
 
   useEffect(() => {
     const handleFullscreenChange = () => {
@@ -81,34 +84,32 @@ export default function EmulatorPlayer({ core, romFiles, onQuit }) {
     };
   }, [isFullscreen]);
 
-  // WebRTC Host Session for Remote Phone Controllers (Up to 2 players)
+  // Attach to the persistent phone controller session (never tears it down)
   useEffect(() => {
+    if (!setRemoteInputHandler || !setRemoteGameState) return undefined;
     const consoleType = coreToConsole(core);
-    const session = createHostSession(roomId, {
-      onPlayersChange: (status) => {
-        setConnectedPlayers(status);
-      },
-      onInput: (data) => {
-        if (!nostalgistRef.current) return;
-        try {
-          const player = data.player || 1;
-          if (data.type === 'down') {
-            nostalgistRef.current.pressDown({ button: data.button, player });
-          } else if (data.type === 'up') {
-            nostalgistRef.current.pressUp({ button: data.button, player });
-          }
-        } catch (err) {
-          console.warn('Error applying remote input:', err);
-        }
-      },
-    }, consoleType);
 
-    hostSessionRef.current = session;
+    setRemoteInputHandler((data) => {
+      if (!nostalgistRef.current) return;
+      try {
+        const player = data.player || 1;
+        if (data.type === 'down') {
+          nostalgistRef.current.pressDown({ button: data.button, player });
+        } else if (data.type === 'up') {
+          nostalgistRef.current.pressUp({ button: data.button, player });
+        }
+      } catch (err) {
+        console.warn('Error applying remote input:', err);
+      }
+    });
+    setRemoteGameState({ consoleType, inGame: true });
 
     return () => {
-      session.destroy();
+      // Detach input only; phones remain connected and are told we're back in the library
+      setRemoteInputHandler(null);
+      setRemoteGameState({ inGame: false });
     };
-  }, [roomId, core]);
+  }, [core, setRemoteInputHandler, setRemoteGameState]);
 
   useEffect(() => {
     let active = true;
